@@ -1,25 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ZAI from 'z-ai-web-dev-sdk';
 
-// Force Node.js runtime for Vercel
 export const runtime = 'nodejs';
+
+const OPENROUTER_API_KEY = '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';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { message, weatherContext, language } = body;
 
-    console.log('[AI Chat] Received request:', { message, language, hasContext: !!weatherContext });
-
     if (!message) {
-      console.log('[AI Chat] No message provided');
       return NextResponse.json({ message: 'Message required' });
     }
-
-    // Create ZAI instance
-    console.log('[AI Chat] Creating ZAI instance...');
-    const zai = await ZAI.create();
-    console.log('[AI Chat] ZAI instance created');
 
     // Build context
     let contextText = '';
@@ -38,42 +30,55 @@ export async function POST(request: NextRequest) {
     }
 
     const systemContent = language === 'ar' 
-      ? `أنت مساعد طقس ذكي اسمه SkyPulse. أجب على أسئلة المستخدم عن الطقس بشكل مختصر ومفيد.${contextText}`
+      ? `أنت مساعد طقس ذكي اسمه SkyPulse. أجب على أسئلة المستخدم عن الطقس بشكل مختصر ومفيد باللغة العربية.${contextText}`
       : `You are SkyPulse, a friendly weather AI assistant. Answer weather questions concisely and helpfully.${contextText}`;
 
-    // Use the exact pattern from the LLM skill documentation
-    console.log('[AI Chat] Sending request to AI...');
-    const completion = await zai.chat.completions.create({
-      messages: [
-        {
-          role: 'assistant',
-          content: systemContent
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ],
-      thinking: { type: 'disabled' }
+    // Call OpenRouter API - try deepseek which is usually available
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://skypulse.app',
+        'X-Title': 'SkyPulse Weather App'
+      },
+      body: JSON.stringify({
+        model: 'deepseek/deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: systemContent
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        max_tokens: 500
+      })
     });
 
-    console.log('[AI Chat] Received completion:', JSON.stringify(completion, null, 2));
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenRouter error:', errorText);
+      return NextResponse.json({ 
+        message: language === 'ar' ? 'عذراً، حدث خطأ في الاتصال.' : 'Sorry, connection error.'
+      });
+    }
 
-    const response = completion.choices?.[0]?.message?.content;
-    
-    if (!response || response.trim().length === 0) {
-      console.error('[AI Chat] Empty response from AI');
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content;
+
+    if (!reply) {
       return NextResponse.json({ 
         message: language === 'ar' ? 'عذراً، لم أتمكن من الرد.' : 'Sorry, no response generated.'
       });
     }
 
-    console.log('[AI Chat] Success! Response:', response);
-    return NextResponse.json({ message: response });
+    return NextResponse.json({ message: reply });
     
   } catch (error: any) {
-    console.error('[AI Chat] Error:', error?.message || error);
-    console.error('[AI Chat] Error stack:', error?.stack);
+    console.error('AI Chat error:', error?.message || error);
     return NextResponse.json({ 
       message: 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.'
     });
