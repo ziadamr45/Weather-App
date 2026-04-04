@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ZAI from 'z-ai-web-dev-sdk';
+import ZAI, { ChatMessage } from 'z-ai-web-dev-sdk';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,65 +7,64 @@ export async function POST(request: NextRequest) {
     const { message, weatherContext, language } = body;
 
     if (!message) {
-      return NextResponse.json({ error: 'Message required' }, { status: 400 });
+      return NextResponse.json({ message: 'Message required' });
     }
 
     // Create ZAI instance
     const zai = await ZAI.create();
 
-    // Build context string
-    let contextStr = '';
+    // Build context
+    let contextText = '';
     if (weatherContext) {
-      contextStr = language === 'ar' 
-        ? `\n\nمعلومات الطقس الحالي:
+      contextText = language === 'ar' 
+        ? `\nمعلومات الطقس الحالية:
 - المدينة: ${weatherContext.city}, ${weatherContext.country}
 - درجة الحرارة: ${weatherContext.temperature}°م
 - الرطوبة: ${weatherContext.humidity}%
-- سرعة الرياح: ${weatherContext.windSpeed} م/ث
 - الحالة: ${weatherContext.condition}`
-        : `\n\nCurrent weather:
+        : `\nCurrent weather info:
 - City: ${weatherContext.city}, ${weatherContext.country}
 - Temperature: ${weatherContext.temperature}°C
 - Humidity: ${weatherContext.humidity}%
-- Wind Speed: ${weatherContext.windSpeed} m/s
 - Condition: ${weatherContext.condition}`;
     }
 
-    const systemPrompt = language === 'ar' 
-      ? `أنت مساعد طقس ذكي اسمه SkyPulse. تجيب على أسئلة المستخدمين عن الطقس بشكل مختصر ومفيد باللغة العربية.${contextStr}`
-      : `You are a friendly AI weather assistant named SkyPulse. Answer questions about weather concisely and helpfully.${contextStr}`;
+    const systemContent = language === 'ar' 
+      ? `أنت مساعد طقس ذكي اسمه SkyPulse. أجب على أسئلة المستخدم عن الطقس بشكل مختصر ومفيد.${contextText}`
+      : `You are SkyPulse, a friendly weather AI assistant. Answer weather questions concisely and helpfully.${contextText}`;
 
-    const completion = await zai.chat.completions.create({
-      messages: [
-        {
-          role: 'assistant',
-          content: systemPrompt
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ],
+    const messages: ChatMessage[] = [
+      {
+        role: 'assistant',
+        content: systemContent
+      },
+      {
+        role: 'user',
+        content: message
+      }
+    ];
+
+    const response = await zai.chat.completions.create({
+      messages,
+      stream: false,
       thinking: { type: 'disabled' }
     });
 
-    const responseText = completion.choices?.[0]?.message?.content;
+    const reply = response.choices?.[0]?.message?.content;
     
-    if (!responseText) {
+    if (!reply) {
+      console.error('No reply from AI:', JSON.stringify(response));
       return NextResponse.json({ 
-        message: language === 'ar' 
-          ? 'عذراً، لم أتمكن من فهم طلبك.' 
-          : 'Sorry, I could not process your request.' 
+        message: language === 'ar' ? 'عذراً، لم أتمكن من الرد.' : 'Sorry, no response generated.'
       });
     }
 
-    return NextResponse.json({ message: responseText });
+    return NextResponse.json({ message: reply });
     
   } catch (error: any) {
-    console.error('AI Chat error:', error);
+    console.error('AI Chat error:', error?.message || error);
     return NextResponse.json({ 
-      message: 'عذراً، حدث خطأ في المعالجة. يرجى المحاولة مرة أخرى.',
-      error: error?.message || 'Unknown error'
+      message: 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.'
     });
   }
 }
