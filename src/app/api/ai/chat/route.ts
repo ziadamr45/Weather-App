@@ -62,10 +62,10 @@ ${weatherContext.uv ? `- UV Index: ${weatherContext.uv}` : ''}
 
 Be concise and helpful. If the user asks about outdoor activities, give advice based on the weather conditions.`;
 
-    const response = await zai.chat.completions.create({
+    const completion = await zai.chat.completions.create({
       messages: [
         {
-          role: 'system',
+          role: 'assistant',
           content: systemPrompt
         },
         {
@@ -73,12 +73,10 @@ Be concise and helpful. If the user asks about outdoor activities, give advice b
           content: message
         }
       ],
-      model: 'glm-4-plus',
-      temperature: 0.7,
-      max_tokens: 500
+      thinking: { type: 'disabled' }
     });
 
-    const assistantMessage = response.choices[0]?.message?.content || 'Sorry, I could not process your request.';
+    const assistantMessage = completion.choices[0]?.message?.content || 'Sorry, I could not process your request.';
 
     return NextResponse.json({ message: assistantMessage });
   } catch (error) {
