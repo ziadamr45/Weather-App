@@ -2,6 +2,10 @@
 
 # 🌤️ تطبيق الطقس | Weather App
 
+## 📸 Screenshot
+
+![Weather-App Screenshot](screenshot.png)
+
 ### تطبيق ويب احترافي لمعرفة حالة الطقس بتحليلات طقس متقدمة (Next.js Frontend)
 ### Professional weather web app with smart forecasts, bilingual UI & beautiful animations
 
