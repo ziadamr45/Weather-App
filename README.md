@@ -2,7 +2,7 @@
 
 # 🌤️ تطبيق الطقس | Weather App
 
-## 📸 Screenshot
+## 📸 لقطات الشاشة | Screenshots
 
 ![Weather-App Screenshot](screenshot.png)
 
