@@ -107,7 +107,7 @@ Weather-/
 
 <div align="center">
 
-Made with ❤️ by [Ziad Amr](https://github.com/ziadamr45)
+Ziad Amr
 
 </div>
 
@@ -200,6 +200,6 @@ Weather-/
 
 <div align="center">
 
-Made with ❤️ by [Ziad Amr](https://github.com/ziadamr45)
+Ziad Amr
 
 </div>
