@@ -18,9 +18,9 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "SkyPulse - Ultra Smart Weather Experience",
-  description: "AI-powered, immersive, real-time weather intelligence platform with stunning visuals and smart recommendations.",
-  keywords: ["SkyPulse", "Weather", "AI", "Real-time", "Forecast", "Arabic"],
-  authors: [{ name: "SkyPulse Team" }],
+  description: "Immersive, real-time weather intelligence platform with stunning visuals and smart recommendations.",
+  keywords: ["SkyPulse", "Weather", "Real-time", "Forecast", "Arabic"],
+  authors: [{ name: "Ziad Amr" }],
   icons: {
     icon: "/logo.svg",
   },

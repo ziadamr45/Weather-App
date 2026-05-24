@@ -32,7 +32,7 @@ const layers = [
   { id: 'wind', label: 'map.wind', icon: Wind, url: 'wind_new' },
 ];
 
-const API_KEY = 'a8ca35a9b77f4024aa0dbca4198bdc22';
+const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || '';
 
 export function WeatherMap() {
   const { currentLocation, currentWeather } = useWeatherStore();
