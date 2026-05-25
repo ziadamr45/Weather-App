@@ -114,7 +114,6 @@ Ziad Amr
 ---
 
 
-
 ### 👨‍💻 المطور
 
 **زياد عمرو (Ziad Amr)**
@@ -133,6 +132,7 @@ Ziad Amr
 ---
 
 ## English
+
 
 **Weather App** is a professional weather web application with advanced weather analysis. It provides accurate forecasts and climate analysis with a bilingual interface (Arabic/English) and beautiful smooth animations.
 
@@ -237,3 +237,4 @@ Ziad Amr
 - 🎥 YouTube: [@alhayat_ala_eltarek](https://youtube.com/@alhayat_ala_eltarek?si=pcsc_31Kcv3Jym14)
 - 💼 LinkedIn: [ziad-amr](https://www.linkedin.com/in/ziad-amr-44633a411)
 - 📧 Email: ziad90216@gmail.com
+
